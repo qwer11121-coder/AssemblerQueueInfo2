@@ -2,6 +2,8 @@ string LCDTag = "AInfo";  //Name of the LCD panel you want the info on
 
 //-------- Don't change anything below this line :) ----------------
 
+const long MONOSPACE_FONT = 1147350002;
+
 List<IMyAssembler> assemblers = new List<IMyAssembler>();
 List<MyProductionItem> singleQueue = new List<MyProductionItem>();
 
@@ -49,7 +51,7 @@ public void Main(string argument, UpdateType updateSource)
         long fontCode = panel.GetValue<long>("Font");
 
         // Monospace Font has only 25 charactors in a line
-        if (fontCode == 1147350002)
+        if (fontCode == MONOSPACE_FONT)
         {
             defaultScreenWidth = 25;
         }
@@ -67,10 +69,38 @@ public void Main(string argument, UpdateType updateSource)
                 text.Append($"<<{name}>>\n").Append(new string('-', defaultScreenWidth)).Append("\n");
                 foreach (var item in outputDict[name])
                 {
-                    string itemText = item.BlueprintId.SubtypeName.Replace("Component", "");
+                    string itemText = "";
+                    switch (item.BlueprintId.SubtypeName)
+                    {
+                        case "ConstructionComponent":
+                            itemText = "Construction Comp.";
+                            break;
+                        case "GravityGeneratorComponent":
+                            itemText = "Gravity Comp.";
+                            break;
+                        case "DetectorComponent":
+                            itemText = "Detector Comp.";
+                            break;
+                        case "MedicalComponent":
+                            itemText = "Medical Comp.";
+                            break;
+                        case "RadioCommunicationComponent":
+                            itemText = "Radio-comm Comp.";
+                            break;
+                        case "ReactorComponent":
+                            itemText = "Reactor Comp.";
+                            break;
+                        case "ThrustComponent":
+                            itemText = "Thruster Comp.";
+                            break;
+                        default:
+                            itemText = item.BlueprintId.SubtypeName.Replace("Component", "");
+                            break;
+                    }
                     string itemAmount = item.Amount.ToString();
                     float dotCount = 0;
-                    if (fontCode == 1147350002)
+                    // Monospace is 
+                    if (fontCode == MONOSPACE_FONT)
                     {
                         dotCount = screenWidth - itemText.Length - itemAmount.Length;
                     }
