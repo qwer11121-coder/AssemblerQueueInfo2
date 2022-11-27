@@ -44,16 +44,14 @@ public void Main(string argument, UpdateType updateSource)
 
     foreach (IMyTextPanel panel in Panels)
     {
-        // By default there could be 38 charactors in a line
-        int defaultScreenWidth = 38;
-        char dot = '_';
+        // By default there could be 32 charactors in a line
+        int defaultScreenWidth = 32;
         long fontCode = panel.GetValue<long>("Font");
 
         // Monospace Font has only 25 charactors in a line
         if (fontCode == 1147350002)
         {
             defaultScreenWidth = 25;
-            dot = '.';
         }
 
         float fontSize = panel.FontSize;
@@ -71,10 +69,18 @@ public void Main(string argument, UpdateType updateSource)
                 {
                     string itemText = item.BlueprintId.SubtypeName.Replace("Component", "");
                     string itemAmount = item.Amount.ToString();
-                    int dotCount = screenWidth - itemText.Length - itemAmount.Length;
+                    float dotCount = 0;
+                    if (fontCode == 1147350002)
+                    {
+                        dotCount = screenWidth - itemText.Length - itemAmount.Length;
+                    }
+                    else
+                    {
+                        dotCount = ((float)screenWidth - CalculateStringWidth(itemText) - CalculateStringWidth(itemAmount)) * 2;
+                    }
                     if (dotCount <= 2)
                         dotCount = 2;
-                    string dots = new string(dot, dotCount);
+                    string dots = new string('.', (int)dotCount);
                     text.Append(itemText)
                     .Append(dots)
                     .Append(itemAmount)
@@ -85,6 +91,131 @@ public void Main(string argument, UpdateType updateSource)
         }
         panel.WriteText(text.ToString());
     }
+}
+
+// Calculate string width for Debug font, use "0" as standard width
+float CalculateStringWidth(string text)
+{
+    float width = 0.0f;
+    foreach (char c in text)
+    {
+        switch (c)
+        {
+            // Symbol
+            case '.':
+                width += 0.5f;
+                break;
+            case '_':
+                width += 0.8f;
+                break;
+            case '-':
+                width += 0.6f;
+                break;
+            case ' ':
+                width += 0.45f;
+                break;
+            // Lower case letter
+            case 'a':
+            case 'b':
+            case 'd':
+            case 'e':
+            case 'g':
+            case 'h':
+            case 'k':
+            case 'n':
+            case 'o':
+            case 'p':
+            case 'q':
+            case 's':
+            case 'u':
+            case 'y':
+                width += 0.9f;
+                break;
+            case 'c':
+            case 'z':
+                width += 0.85f;
+                break;
+            case 'f':
+            case 'r':
+            case 't':
+                width += 0.5f;
+                break;
+            case 'i':
+            case 'j':
+            case 'l':
+                width += 0.45f;
+                break;
+            case 'm':
+            case 'w':
+                width += 1.4f;
+                break;
+            case 'x':
+            case 'v':
+                width += 0.8f;
+                break;
+            // Upper case letter
+            case 'A':
+            case 'B':
+            case 'D':
+            case 'N':
+            case 'O':
+            case 'Q':
+            case 'R':
+            case 'S':
+                width += 1.1f;
+                break;
+            case 'C':
+            case 'X':
+            case 'Z':
+                width += 1.0f;
+                break;
+            case 'E':
+                width += 0.95f;
+                break;
+            case 'F':
+            case 'K':
+            case 'T':
+                width += 0.9f;
+                break;
+            case 'G':
+            case 'H':
+            case 'P':
+            case 'U':
+            case 'V':
+            case 'Y':
+                width += 1.05f;
+                break;
+            case 'I':
+                width += 0.45f;
+                break;
+            case 'J':
+                width += 0.85f;
+                break;
+            case 'L':
+                width += 0.8f;
+                break;
+            case 'M':
+                width += 1.35f;
+                break;
+            case 'W':
+                width += 1.6f;
+                break;
+            // Number
+            case '1':
+                width += 0.5f;
+                break;
+            case '3':
+                width += 0.9f;
+                break;
+            case '7':
+                width += 0.85f;
+                break;
+            default:
+                width += 1.0f;
+                break;
+        }
+    }
+    return width;
 }
 
 void UpdatePanels()
