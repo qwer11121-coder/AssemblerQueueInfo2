@@ -27,11 +27,12 @@ public void Main(string argument, UpdateType updateSource)
         GridTerminalSystem.GetBlocksOfType(assemblers);
     }
 
+    // Iterate each assembler and save its queue data into outputDict
     for (int i = 0; i < assemblers.Count; i++)
     {
+        string name = assemblers[i].CustomName;
         if (!assemblers[i].IsQueueEmpty)
-        {
-            string name = assemblers[i].CustomName;
+        {            
             assemblers[i].GetQueue(singleQueue);
             outputDict[name] = new List<MyProductionItem>();
             if (singleQueue.Count > 0)
@@ -42,8 +43,13 @@ public void Main(string argument, UpdateType updateSource)
                 }
             }
         }
+        else
+        {
+            outputDict[name] = null;
+        }
     }
 
+    // Show data on LCD
     foreach (IMyTextPanel panel in Panels)
     {
         // By default there could be 32 charactors in a line
@@ -67,6 +73,11 @@ public void Main(string argument, UpdateType updateSource)
             {
                 // output data in outputDict as Text
                 text.Append($"<<{name}>>\n").Append(new string('-', defaultScreenWidth)).Append("\n");
+                if(outputDict[name] == null)
+                {
+                    text.Append("Queue is empty\n\n");
+                    continue;
+                }
                 foreach (var item in outputDict[name])
                 {
                     string itemText = "";
